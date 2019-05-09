@@ -1,0 +1,57 @@
+secrets:
+  - kmsKeyName: projects/<Project-Name>/locations/global/keyRings/<KEYRING-NAME>/cryptoKeys/<KEY-NAME>
+    secretEnv:
+      FIREBASE_TOKEN: <Encryption Token>
+
+steps:
+- id: "Decrypt the secret key"
+  name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=.ssh/id_ed25519.enc
+  - --plaintext-file=/root/.ssh/id_ed25519
+  - --location=global
+  - --keyring=<KEYRING-NAME>
+  - --key=<KEY-NAME>
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+- id: "Settings for performing SSH authentication"
+  name: 'gcr.io/cloud-builders/git'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    chmod 600 /root/.ssh/id_ed25519
+    cat <<EOF >/root/.ssh/config
+    HostName github.com
+    IdentityFile /root/.ssh/id_ed25519
+    StrictHostKeyChecking no
+    EOF
+    mv .ssh/known_hosts /root/.ssh/known_hosts
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+- id: "git submodule update"
+  name: 'gcr.io/cloud-builders/git'
+  args: 
+  - submodule
+  - update
+  - --init
+  - --recursive
+  - --remote
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+- id: "Generate html with hugo"
+  name: 'gcr.io/${PROJECT_ID}/hugo'
+  args: ['--minify']
+
+- id: "Deploy to Firebase Hosting"
+  name: 'gcr.io/${PROJECT_ID}/firebase'
+  args: ['deploy']
+  secretEnv: ['FIREBASE_TOKEN']
