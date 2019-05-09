@@ -1,10 +1,10 @@
 # build_hugo-extended_ci
 
-# Overview
+## Overview
 
 Deploy on Cloud-Build with Hugo-Extended and build a CI that deploys the product to Firebase-Hosting.
 
-# Description
+## Description
 
 [GoogleCloudPlatform/cloud-builders-community][1] Create Hugo-Extended buildable image based on Docker image published in repository.
 
@@ -16,14 +16,14 @@ Therefore, the content of "hugo / Dockerfile" is customized for Hugo-Extended.
 
 At the same time, it stores "cloudbuild.yaml" that describes the CI processing sample to be run by Cloud-Build.
 
-# Premise
+## Premise
 
 1. [Google Cloud SDK][2] is installed on the device to work.
 1. GCP is available
 	* Firebase Hosting Available
 1. I have created a private repository on GitHub to manage the Hugo content I want to build.
 
-# Usage
+## Usage
 
 1. Container creation used by Cloud Build
 
@@ -62,7 +62,7 @@ At the same time, it stores "cloudbuild.yaml" that describes the CI processing s
 		* Therefore, the secret key for accessing the repository that manages the theme is encrypted and placed in the repository that manages Hugo content.
 		* If you use the theme of the public repository, or manage the theme in the same repository, please modify as appropriate according to the use case.
 
-# Licence
+## Licence
 This source code is licensed under Apache 2.0. Full license text is available in [Here][4].
 
 # Authors
